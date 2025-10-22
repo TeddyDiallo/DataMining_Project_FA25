@@ -27,7 +27,6 @@ fit_svm <- function(X, y, learning_rate = 0.01, lambda = 0.001, n_iters = 1000) 
         b <- b + learning_rate * y_[i]
       }
     }
-    
   }
   #Returns the weights and biases of the hyperplane
   hyperplane <- list(w = w, b = b)
@@ -44,13 +43,15 @@ predict_svm <- function(X, model) {
 
 
 #A function to fit the logistic regression model to a given X(data matrix) and y(labels)
-fit_logistic_regression <- function(X, y, learning_rate = 0.001, lambda = 0, n_iters = 1000) {
+fit_logistic_regression <- function(X, y, learning_rate = 0.001, lambda = 0.01, n_iters = 1000) {
   n_samples <- nrow(X)
+  
+  #Add a bias term
+  X <- cbind(1, X)
   n_features <- ncol(X)
   
-  #Initialize weights and add a bias term
+  #Initialize weights
   weights <- rep(0, n_features)
-  X <- cbind(1, X)
   
   for (i in 1:n_iters) {
     #Linear combination
@@ -74,9 +75,9 @@ fit_logistic_regression <- function(X, y, learning_rate = 0.001, lambda = 0, n_i
 
 #A function to take in a model created by fit LR function and predict on some data
 predict_logistic_regression <- function(X, model) {
+  X <- cbind(1, X)
   z <- as.matrix(X) %*% model$weights
   probs <- 1 / (1 + exp(-z))
   labels <- ifelse(probs >= 0.5, 1, 0)
   return(labels)
 }
-
