@@ -1,0 +1,135 @@
+.dc-root {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dc-card {
+  width: 90%;
+  height: 85vh;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.dc-gradient-bar {
+  height: 80px;
+  background: linear-gradient(90deg, #d2e1ff, #e6e5ff, #ffe9c7);
+}
+
+.dc-inner {
+  flex: 1;
+  padding: 40px 60px;
+  overflow-y: auto; 
+}
+
+.dc-title {
+  margin: 0;
+  font-size: 2.1rem;
+  color: #3c3f52;
+}
+
+.dc-subtitle {
+  margin: 10px 0 30px;
+  color: #777880;
+  max-width: 550px;
+}
+
+.dc-rows {
+  margin-top: 20px;
+}
+
+.dc-row {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr;
+  align-items: center;
+  margin-bottom: 18px;
+  column-gap: 40px;
+}
+
+.dc-question {
+  font-size: 0.95rem;
+  color: #555766;
+}
+
+.dc-controls {
+  display: flex;
+  gap: 10px;
+}
+
+.dc-btn {
+  flex: 1;
+  padding: 8px 0;
+  border-radius: 8px;
+  border: 1px solid #c2cff8;
+  background-color: #ffffff;
+  color: #4a6ad8;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.08s ease, box-shadow 0.08s ease,
+    transform 0.08s ease;
+}
+
+.dc-btn-active {
+  background-color: #d7e2ff;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+}
+
+.dc-btn:hover {
+  background-color: #e2e7ff;
+}
+
+.dc-input {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #f0f0f0;
+  background-color: #f8f8ff;
+  outline: none;
+  font-size: 0.9rem;
+  color: #555766;
+}
+
+.dc-input:focus {
+  border-color: #c2cff8;
+}
+
+.dc-next-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+  padding-bottom: 20px;
+}
+
+.dc-next-btn {
+  width: 180px;
+  padding: 12px 0;
+  border-radius: 8px;
+  border: none;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.15s ease;
+}
+
+.dc-next-btn.enabled {
+  background-color: #4a6ad8;
+  color: white;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+.dc-next-btn.enabled:hover {
+  background-color: #3d59b8;
+}
+
+.dc-next-btn.disabled {
+  background-color: #d6d8e0;
+  color: #8d90a1;
+  cursor: not-allowed;
+  box-shadow: none;
+}
