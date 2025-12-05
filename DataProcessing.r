@@ -86,7 +86,7 @@ predict_logistic_regression <- function(X, model) {
 }
 
 #Read in data
-diabetes_data <- read.csv("../../archive/diabetes_binary_5050split_health_indicators_BRFSS2015.csv",header=TRUE)
+diabetes_data <- read.csv("./archive/diabetes_binary_5050split_health_indicators_BRFSS2015.csv",header=TRUE)
 set.seed(25)
 
 #Shuffle rows
