@@ -1,25 +1,24 @@
 import React from "react";
 import "../styles/Results.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Results = ({ healthGroup = "Diabetic" }) => {
     const navigate = useNavigate();
-
+    const location = useLocation();
+    const prediction = location.state?.prediction;
     let message;
 
-    switch (healthGroup) {
-        case "Healthy":
-            message =
-                "Our model indicates that you are currently at low risk for diabetes. Maintain your healthy lifestyle and continue regular check-ups with your doctor.";
-            break;
-        case "Prediabetic":
-            message =
-                "Our model indicates that you may be at increased risk for developing diabetes. Lifestyle changes and early intervention can significantly reduce your risk. Please consult your doctor for personalized advice.";
-            break;
-        case "Diabetic":
+    switch (prediction) {
+        case 0:
         default:
             message =
-                "Our model indicates that you are at risk for diabetes. These results do not replace a real medical diagnosis. See your doctor for a proper diagnosis and treatment plan.";
+                "Our model indicates that you are currently at low risk for diabetes. Maintain your healthy lifestyle and continue regular check-ups with your doctor.";
+            healthGroup = "Healthy"
+            break;
+        case 1:
+            message =
+                "Our model indicates that you may be at increased risk for developing diabetes. Lifestyle changes and early intervention can significantly reduce your risk. Please consult your doctor for personalized advice.";
+            healthGroup = "At risk for diabetes"
             break;
     }
 
