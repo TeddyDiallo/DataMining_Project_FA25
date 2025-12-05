@@ -1,8 +1,8 @@
 packages <- c(
   "plumber",
   "jsonlite",
-  "ggplot2",
-  "dplyr"
+  "psych",
+  "caret"
 )
 
 install_if_missing <- function(pkg) {
