@@ -5,10 +5,13 @@ import { useNavigate, useLocation } from "react-router-dom";
 const Results = ({ healthGroup = "Diabetic" }) => {
     const navigate = useNavigate();
     const location = useLocation();
-    const prediction = location.state?.prediction;
+    const prediction = location.state?.predictions;
+    const svm_prediction = prediction[0]
+    const logistic_prediction = predictions[1]
+
     let message;
 
-    switch (prediction) {
+    switch (svm_prediction) {
         case 0:
         default:
             message =

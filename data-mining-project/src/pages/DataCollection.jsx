@@ -94,6 +94,7 @@ const DataCollection = () => {
     ];
 
     try {
+        //Call predict endpoint
         const response = await fetch("http://localhost:9559/predict", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -101,8 +102,38 @@ const DataCollection = () => {
         });
 
         const data = await response.json();
-        console.log("Prediction:", data.predictions);
-        navigate("/results", { state: { prediction: data.predictions[0][0] } });
+
+        // Call SVM plot endpoint
+        const plotSVMResponse = await fetch("http://localhost:9559/plot_svm", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            testing: data.pc_testing,
+            svm_prediction: data.predictions[0]
+        })
+        });
+        const svmBlob = await plotSVMResponse.blob();
+        const svmPlotURL = URL.createObjectURL(svmBlob);
+
+        // Call Logistic plot endpoint
+        const plotLogisticResponse = await fetch("http://localhost:9559/plot_logistic", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            testing: data.pc_testing,
+            logistic_prediction: data.predictions[1]
+        })
+        });
+        const logisticBlob = await plotLogisticResponse.blob();
+        const logisticPlotURL = URL.createObjectURL(logisticBlob);
+
+        navigate("/results", {
+            state: {
+                prediction: data.predictions,
+                svm_plot_url: svmPlotURL,
+                logistic_plot_url: logisticPlotURL
+            }
+        });
 
     } catch (error) {
         console.error("API error:", error);
