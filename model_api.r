@@ -7,32 +7,12 @@ predict_svm <- function(X, model) {
   return(labels)
 }
 
-predict_logistic_regression <- function(X, model) {
+predict_logistic <- function(X, model) {
   X <- cbind(1, X)
   z <- as.matrix(X) %*% model$weights
   probs <- 1 / (1 + exp(-z))
   labels <- ifelse(probs >= 0.5, 1, 0)
   return(labels)
-}
-
-plot_decision_boundary_svm <- function(model, X, y) {
-  w <- model$w
-  b <- model$b
-  
-  cols <- ifelse(y_sample <= 0, 2, 4)   # 2=red, 4=blue
-  cols <- adjustcolor(cols, alpha.f = 0.3)
-  
-  plot(X_sample[,1], X_sample[,2], col = cols,xlab="X_1",y_lab="X_2", pch = 19)
-  
-  if (abs(w[2]) < 1e-8) {
-    abline(v = -b / w[1], col = "blue", lwd = 2)
-    return()
-  }
-  
-  x_vals <- seq(min(X[,1]), max(X[,1]), length.out = 600)
-  y_vals <- -(b + w[1] * x_vals) / w[2]
-  
-  lines(x_vals, y_vals, col="blue", lwd=2)
 }
 
 #* @filter cors
@@ -56,22 +36,22 @@ cors <- function(req,res) {
 #* @json
 predict_endpoint <- function(X) {
   X_mat <- as.matrix(X)
-  pc <- readRDS("../pca_model.rds")
+  pc <- readRDS("./pca_model.rds")
   
   X_test_scaled <- scale(X_mat, center = pc$center, scale = pc$scale)
   pc_test <- as.matrix(X_test_scaled) %*% pc$rotation[, 1:2]
   
-  model <- readRDS("../svm_model.rds")
+  model <- readRDS("./svm_model.rds")
   pred_svm <- predict_svm(pc_test, model)
   
-  model <- readRDS("../logistic_model.rds")
+  model <- readRDS("./logistic_model.rds")
   pred_logistic <- predict_logistic(pc_test, model)
   preds <- list(pred_svm,pred_logistic)
   
   list(predictions = preds, pc_testing = pc_test)
 }
 
-#* Draw a plot with the user data on it
+#* Draw the svm decision boundary with sample data and user point
 #* @post /plot_svm
 #* @param pc_test:list The first 2 principal components of user data
 #* @param prediction:double The prediction output by the model
@@ -79,21 +59,31 @@ predict_endpoint <- function(X) {
 plot_svm_endpoint <- function(pc_test,prediction) {
   
   pc <- as.numeric(pc_test)
-  model <- readRDS("../svm_model.rds")
-  X_sample <- readRDS("../x_sample.rds")
-  y_sample <- readRDS("../y_sample.rds")
+  model <- readRDS("./svm_model.rds")
+  X_sample <- readRDS("./x_sample.rds")
+  y_sample <- readRDS("./y_sample.rds")
   
   w <- model$w
   b <- model$b
   
-  cols <- ifelse(y_sample <= 0, 2, 4)   # 2=red, 4=blue
+  cols <- ifelse(y_sample <= 0, 4, 2)   # 2=red, 4=blue
   cols <- adjustcolor(cols, alpha.f = 0.3)
   
-  plot(X_sample[,1], X_sample[,2], col = cols,xlab="X_1", pch = 19)
-  print(pc)
-  print(pc[1])
-  print(pc[2])
-  points(pc[1], pc[2], col = "black", bg="yellow", pch=21, cex=2)
+  plot(X_sample[,1],
+       X_sample[,2],
+       col = cols,
+       xlab = "",
+       ylab = "",
+       axes = FALSE,
+       ann = FALSE,
+       pch = 19)
+  
+  points(pc[1],
+         pc[2],
+         col = "black",
+         bg="yellow",
+         pch=21,
+         cex=2)
   
   if (abs(w[2]) < 1e-8) {
     abline(v = -b / w[1], col = "blue", lwd = 2)
@@ -103,12 +93,24 @@ plot_svm_endpoint <- function(pc_test,prediction) {
   x_vals <- seq(min(X_sample[,1]), max(X_sample[,1]), length.out = 600)
   y_vals <- -(b + w[1] * x_vals) / w[2]
   
-  lines(x_vals, y_vals, col="blue", lwd=2)
+  lines(x_vals,
+        y_vals,
+        col="green",
+        lwd=2)
   
+  legend(
+    "topright",
+    legend = c("At risk of diabetes", "Healthy", "You", "Decision boundary"),
+    col     = c("red", "blue", "black", "green"),
+    pt.bg   = c(NA, NA, "yellow", NA),
+    pch     = c(19, 19, 21, NA),
+    lwd     = c(NA, NA, NA, 2),
+    bty     = "n"        
+  )
 }
 
 
-#* Plot logistic regression boundary with new point
+#* Draw the logistic decision boundary with sample data and user point
 #* @post /plot_logistic
 #* @param pc_test:list The first 2 principal components of user data
 #* @param prediction:double The prediction output by the model
@@ -116,14 +118,14 @@ plot_svm_endpoint <- function(pc_test,prediction) {
 plot_logistic_endpoint <- function(pc_test, prediction) {
   
   # Convert testing to numeric vector (PC1, PC2)
-  new_point <- as.numeric(unlist(pc_test))
+  pc <- as.numeric(pc_test)
   
-  model <- readRDS("../logistic_model.rds")
-  X_sample <- readRDS("../x_sample.rds")
-  y_sample <- readRDS("../y_sample.rds")
+  model <- readRDS("./logistic_model.rds")
+  X_sample <- readRDS("./x_sample.rds")
+  y_sample <- readRDS("./y_sample.rds")
   
   # Colors with transparency
-  cols <- ifelse(y_sample == 1, 4, 2)
+  cols <- ifelse(y_sample == 0, 4, 2)
   cols <- adjustcolor(cols, alpha.f = 0.3)
   
   # Extract weights
@@ -136,25 +138,37 @@ plot_logistic_endpoint <- function(pc_test, prediction) {
     X_sample[,1], X_sample[,2],
     col = cols,
     pch = 19,
-    xlab = "PC1", ylab = "PC2"
+    xlab = "",
+    ylab = "",
+    axes = FALSE,
+    ann = FALSE
   )
   
   # Add new point
   points(
-    new_point[1], new_point[2],
+    pc[1], pc[2],
     pch = 21,
     cex = 2,
     col = "black",
-    bg = ifelse(logistic_prediction == 1, "yellow", "white")
+    bg = ifelse(prediction == 1, "yellow", "white")
   )
   
   # Logistic boundary
-  if (abs(w2) < 1e-8) {
-    abline(v = -b / w1, col = "blue", lwd = 2)
-  } else {
     x_vals <- seq(min(X_sample[,1]), max(X_sample[,1]), length.out = 500)
     y_vals <- -(b + w1 * x_vals) / w2
-    lines(x_vals, y_vals, lwd = 2, col = "blue")
-  }
+    lines(x_vals,
+          y_vals,
+          lwd = 2,
+          col = "green")
+  
+  legend(
+    "topright",
+    legend = c("At risk of diabetes", "Healthy", "You", "Decision boundary"),
+    col     = c("red", "blue", "black", "green"),
+    pt.bg   = c(NA, NA, "yellow", NA),
+    pch     = c(19, 19, 21, NA),
+    lwd     = c(NA, NA, NA, 2),
+    bty     = "n"        
+  )
 }
 

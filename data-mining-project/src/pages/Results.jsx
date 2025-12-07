@@ -5,24 +5,25 @@ import { useNavigate, useLocation } from "react-router-dom";
 const Results = ({ healthGroup = "Diabetic" }) => {
     const navigate = useNavigate();
     const location = useLocation();
-    const prediction = location.state?.predictions;
-    const svm_prediction = prediction[0]
-    const logistic_prediction = predictions[1]
-
+    //Get predictions and plots passed from DataCollection page
+    const predictions = location.state?.predictions;
+    const svm_plot_url = location.state?.svm_plot_url;
+    const svm_prediction = predictions[0][0][0]
+    const logistic_plot_url = location.state?.logistic_plot_url;
+    const logistic_prediction = predictions[1][0][0]
     let message;
 
-    switch (svm_prediction) {
-        case 0:
-        default:
+    //Change message depending on the predictions
+    if (svm_prediction === 0 && logistic_prediction === 0) {
             message =
-                "Our model indicates that you are currently at low risk for diabetes. Maintain your healthy lifestyle and continue regular check-ups with your doctor.";
+                "Our models indicate that you are currently at low risk for diabetes. Maintain your healthy lifestyle and continue regular check-ups with your doctor.";
             healthGroup = "Healthy"
-            break;
-        case 1:
+    }
+    //Say user is at risk if either of the two models says they are at risk
+    else{
             message =
-                "Our model indicates that you may be at increased risk for developing diabetes. Lifestyle changes and early intervention can significantly reduce your risk. Please consult your doctor for personalized advice.";
+                "Our models indicate that you may be at increased risk for developing diabetes. Lifestyle changes and early intervention can significantly reduce your risk. Please consult your doctor for personalized advice.";
             healthGroup = "At risk for diabetes"
-            break;
     }
 
     return (
@@ -44,28 +45,13 @@ const Results = ({ healthGroup = "Diabetic" }) => {
                         {/* Logistic Regression */}
                         <div className="res-model-section">
                             <h2 className="res-model-title">Logistic Regression:</h2>
-                            <div className="res-placeholder large">
-                                <span>Plot Placeholder</span>
-                            </div>
+                                <img src={logistic_plot_url} />
                         </div>
 
                         {/* Support Vector Machine */}
                         <div className="res-model-section">
                             <h2 className="res-model-title">Support Vector Machine:</h2>
-                            <div className="res-svm-grid">
-                                <div className="res-placeholder small">
-                                    <span>Plot</span>
-                                </div>
-                                <div className="res-placeholder small">
-                                    <span>Plot</span>
-                                </div>
-                                <div className="res-placeholder small">
-                                    <span>Plot</span>
-                                </div>
-                                <div className="res-placeholder small">
-                                    <span>Plot</span>
-                                </div>
-                            </div>
+                                <img src={svm_plot_url} />
                         </div>
                     </div>
 

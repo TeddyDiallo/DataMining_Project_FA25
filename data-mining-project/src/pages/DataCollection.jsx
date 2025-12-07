@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "../styles/DataCollection.css";
 import { useNavigate } from "react-router-dom";
 
+//Bucketizes age to align with the dataset
 function ageToBRFSS(age) {
     if (age < 18) return null; // BRFSS only codes 18+
     if (age >= 80) return 13;
@@ -108,20 +109,18 @@ const DataCollection = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-            testing: data.pc_testing,
-            svm_prediction: data.predictions[0]
+            pc_test: data.pc_testing,
         })
         });
         const svmBlob = await plotSVMResponse.blob();
         const svmPlotURL = URL.createObjectURL(svmBlob);
 
-        // Call Logistic plot endpoint
+        // Call logistic plot endpoint
         const plotLogisticResponse = await fetch("http://localhost:9559/plot_logistic", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-            testing: data.pc_testing,
-            logistic_prediction: data.predictions[1]
+            pc_test: data.pc_testing,
         })
         });
         const logisticBlob = await plotLogisticResponse.blob();
@@ -129,7 +128,7 @@ const DataCollection = () => {
 
         navigate("/results", {
             state: {
-                prediction: data.predictions,
+                predictions: data.predictions,
                 svm_plot_url: svmPlotURL,
                 logistic_plot_url: logisticPlotURL
             }
