@@ -110,6 +110,8 @@ pc_train <- as.matrix(pc$x[, 1:num_components])
 X_test_scaled <- scale(X_test, center = pc$center, scale = pc$scale)
 pc_test <- as.matrix(X_test_scaled) %*% pc$rotation[, 1:num_components]
 
+#These are some scaled and transformed samples saved for 
+#plotting graphs shown to user on webpage
 idx <- sample(nrow(pc_test), 1500)
 X_sample <- pc_test[idx, ]
 y_sample <- y_test[idx]

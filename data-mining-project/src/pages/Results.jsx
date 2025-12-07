@@ -11,6 +11,8 @@ const Results = ({ healthGroup = "Diabetic" }) => {
     const svm_prediction = predictions[0][0][0]
     const logistic_plot_url = location.state?.logistic_plot_url;
     const logistic_prediction = predictions[1][0][0]
+    const probabilities = location.state?.probs;
+    const average_probability = Number(((probabilities[0][0][0] + probabilities[1][0][0]) / 2 * 100).toFixed(1));
     let message;
 
     //Change message depending on the predictions
@@ -26,6 +28,8 @@ const Results = ({ healthGroup = "Diabetic" }) => {
             healthGroup = "At risk for diabetes"
     }
 
+    let probability_message  = "We estimate that you have a " + average_probability + "% chance of being at risk of diabetes."
+
     return (
         <div className="res-root">
             <div className="res-card">
@@ -40,6 +44,7 @@ const Results = ({ healthGroup = "Diabetic" }) => {
                     </p>
 
                     <p className="res-message">{message}</p>
+                    <p className="res-message">{probability_message}</p>
 
                     <div className="res-models">
                         {/* Logistic Regression */}

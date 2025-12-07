@@ -96,7 +96,7 @@ const DataCollection = () => {
 
     try {
         //Call predict endpoint
-        const response = await fetch("http://localhost:9559/predict", {
+        const response = await fetch("http://localhost:8000/predict", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ X })
@@ -105,7 +105,7 @@ const DataCollection = () => {
         const data = await response.json();
 
         // Call SVM plot endpoint
-        const plotSVMResponse = await fetch("http://localhost:9559/plot_svm", {
+        const plotSVMResponse = await fetch("http://localhost:8000/plot_svm", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -116,7 +116,7 @@ const DataCollection = () => {
         const svmPlotURL = URL.createObjectURL(svmBlob);
 
         // Call logistic plot endpoint
-        const plotLogisticResponse = await fetch("http://localhost:9559/plot_logistic", {
+        const plotLogisticResponse = await fetch("http://localhost:8000/plot_logistic", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -128,6 +128,7 @@ const DataCollection = () => {
 
         navigate("/results", {
             state: {
+                probs: data.probs,
                 predictions: data.predictions,
                 svm_plot_url: svmPlotURL,
                 logistic_plot_url: logisticPlotURL

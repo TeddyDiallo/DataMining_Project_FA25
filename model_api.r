@@ -1,18 +1,24 @@
 library(plumber)
 library(jsonlite)
 
+#This function predicts the label of some 
+#set of data points using a support vector machine
 predict_svm <- function(X, model) {
   approx <- as.matrix(X) %*% model$w + model$b
   labels <- ifelse(approx >= 0, 1, 0)
-  return(labels)
+  #Probability approximation using logistic function
+  probs <- 1 / (1 + exp(-approx))
+  return(list(labels=labels,probs=probs))
 }
 
+#This function predicts the label of some 
+#set of data points using logistic regression
 predict_logistic <- function(X, model) {
   X <- cbind(1, X)
   z <- as.matrix(X) %*% model$weights
   probs <- 1 / (1 + exp(-z))
   labels <- ifelse(probs >= 0.5, 1, 0)
-  return(labels)
+  return(list(labels=labels,probs=probs))
 }
 
 #* @filter cors
@@ -33,7 +39,7 @@ cors <- function(req,res) {
 #* Predict from the model
 #* @post /predict
 #* @param X:list The input feature matrix as a list of lists
-#* @json
+#* @serializer json
 predict_endpoint <- function(X) {
   X_mat <- as.matrix(X)
   pc <- readRDS("./pca_model.rds")
@@ -42,19 +48,25 @@ predict_endpoint <- function(X) {
   pc_test <- as.matrix(X_test_scaled) %*% pc$rotation[, 1:2]
   
   model <- readRDS("./svm_model.rds")
-  pred_svm <- predict_svm(pc_test, model)
+  predictions <- predict_svm(pc_test, model)
+  pred_svm <- predictions$labels
+  prob_svm <- predictions$probs
   
   model <- readRDS("./logistic_model.rds")
-  pred_logistic <- predict_logistic(pc_test, model)
-  preds <- list(pred_svm,pred_logistic)
+  predictions <- predict_logistic(pc_test, model)
+  pred_logistic <- predictions$labels
+  prob_logistic <- predictions$probs
   
-  list(predictions = preds, pc_testing = pc_test)
+  preds <- list(pred_svm,pred_logistic)
+  probs <- list(prob_svm,prob_logistic)
+  
+  list(predictions = preds, pc_testing = pc_test, probs = probs)
 }
 
 #* Draw the svm decision boundary with sample data and user point
 #* @post /plot_svm
 #* @param pc_test:list The first 2 principal components of user data
-#* @png
+#* @serializer png
 plot_svm_endpoint <- function(pc_test) {
   
   pc <- as.numeric(pc_test)
@@ -73,6 +85,7 @@ plot_svm_endpoint <- function(pc_test) {
        col = cols,
        xlab = "",
        ylab = "",
+       axes = FALSE,
        pch = 19)
   
   points(pc[1],
@@ -110,7 +123,7 @@ plot_svm_endpoint <- function(pc_test) {
 #* Draw the logistic decision boundary with sample data and user point
 #* @post /plot_logistic
 #* @param pc_test:list The first 2 principal components of user data
-#* @png
+#* @serializer png
 plot_logistic_endpoint <- function(pc_test) {
   
   # Convert testing to numeric vector (PC1, PC2)
@@ -133,9 +146,10 @@ plot_logistic_endpoint <- function(pc_test) {
   plot(
     X_sample[,1], X_sample[,2],
     col = cols,
-    pch = 19,
     xlab = "",
-    ylab = ""
+    ylab = "",
+    axes = FALSE,
+    pch = 19,
   )
   
   # Add new point
@@ -153,6 +167,7 @@ plot_logistic_endpoint <- function(pc_test) {
     lines(x_vals,
           y_vals,
           lwd = 2,
+          ann = FALSE,
           col = "green")
   
   legend(
