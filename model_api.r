@@ -144,7 +144,7 @@ plot_logistic_endpoint <- function(pc_test) {
     pch = 21,
     cex = 2,
     col = "black",
-    bg = ifelse(prediction == 1, "yellow", "white")
+    bg = "yellow"
   )
   
   # Logistic boundary
