@@ -54,9 +54,8 @@ predict_endpoint <- function(X) {
 #* Draw the svm decision boundary with sample data and user point
 #* @post /plot_svm
 #* @param pc_test:list The first 2 principal components of user data
-#* @param prediction:double The prediction output by the model
 #* @png
-plot_svm_endpoint <- function(pc_test,prediction) {
+plot_svm_endpoint <- function(pc_test) {
   
   pc <- as.numeric(pc_test)
   model <- readRDS("./svm_model.rds")
@@ -74,8 +73,6 @@ plot_svm_endpoint <- function(pc_test,prediction) {
        col = cols,
        xlab = "",
        ylab = "",
-       axes = FALSE,
-       ann = FALSE,
        pch = 19)
   
   points(pc[1],
@@ -113,9 +110,8 @@ plot_svm_endpoint <- function(pc_test,prediction) {
 #* Draw the logistic decision boundary with sample data and user point
 #* @post /plot_logistic
 #* @param pc_test:list The first 2 principal components of user data
-#* @param prediction:double The prediction output by the model
 #* @png
-plot_logistic_endpoint <- function(pc_test, prediction) {
+plot_logistic_endpoint <- function(pc_test) {
   
   # Convert testing to numeric vector (PC1, PC2)
   pc <- as.numeric(pc_test)
@@ -139,9 +135,7 @@ plot_logistic_endpoint <- function(pc_test, prediction) {
     col = cols,
     pch = 19,
     xlab = "",
-    ylab = "",
-    axes = FALSE,
-    ann = FALSE
+    ylab = ""
   )
   
   # Add new point

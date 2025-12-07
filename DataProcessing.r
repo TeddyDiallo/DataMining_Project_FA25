@@ -86,7 +86,7 @@ predict_logistic_regression <- function(X, model) {
 }
 
 #Read in data
-diabetes_data <- read.csv("./archive/diabetes_binary_5050split_health_indicators_BRFSS2015.csv",header=TRUE)
+diabetes_data <- read.csv("./diabetes_binary_5050split_health_indicators_BRFSS2015.csv",header=TRUE)
 set.seed(25)
 
 #Shuffle rows
@@ -101,7 +101,7 @@ y_test  <- diabetes_data[60001:nrow(diabetes_data), 1]
 pc <- prcomp(X_train, center = TRUE, scale = TRUE)
 saveRDS(pc, file = "pca_model.rds")
 
-num_components <- 10
+num_components <- 2
 
 # Project training data
 pc_train <- as.matrix(pc$x[, 1:num_components])
@@ -110,13 +110,18 @@ pc_train <- as.matrix(pc$x[, 1:num_components])
 X_test_scaled <- scale(X_test, center = pc$center, scale = pc$scale)
 pc_test <- as.matrix(X_test_scaled) %*% pc$rotation[, 1:num_components]
 
+idx <- sample(nrow(pc_test), 1500)
+X_sample <- pc_test[idx, ]
+y_sample <- y_test[idx]
+saveRDS(X_sample, "x_sample.rds")
+saveRDS(y_sample, "y_sample.rds")
+
 #Run the model
 print("Starting logistic training")
 model <- fit_logistic_regression(pc_train,y_train,learning_rate = 0.001,lambda = 0.01,n_iters = 1000)
 saveRDS(model, file = "logistic_model.rds")
 print("Logistic training finished and saved as logistic_model.rds")
 predictions_logistic <- predict_logistic_regression(pc_test,model)
-print(sum(predictions_logistic == 1))
 accuracy <- mean(predictions_logistic == y_test)
 #Print out accuracy
 print(accuracy)
@@ -127,7 +132,6 @@ model <- fit_svm(pc_train,y_train,learning_rate = 0.01,lambda = 0.001,n_iters = 
 saveRDS(model, file = "svm_model.rds")
 print("SVM training finished and saved as svm_model.rds")
 predictions_svm <- predict_svm(pc_test,model)
-print(sum(predictions_svm == 1))
 accuracy <- mean(predictions_svm == y_test)
 #Print out accuracy
 print(accuracy)
