@@ -22,7 +22,7 @@ const DataCollection = () => {
     const [cholChecked5yr, setCholChecked5yr] = useState(null); // true/false
     const [bmi, setBmi] = useState("");
     const [smoker, setSmoker] = useState(null);
-    const [stroke, setStroke] = useState(null);  
+    const [stroke, setStroke] = useState(null);
     const [heartIssues, setHeartIssues] = useState(null); // Binary
     const [physActivity, setPhysActivity] = useState(null); // Binary
     const [fruits, setFruits] = useState(null);          // Binary
@@ -33,9 +33,9 @@ const DataCollection = () => {
     const [genHlth, setGenHlth] = useState("");          // 1–5
     const [mentHlth, setMentHlth] = useState("");          // 1–5
     const [physHlth, setPhysHlth] = useState("");          // 1–5
-    const [difWalking, setdifWalking] = useState(null); 
-    const [sex, setSex] = useState(null); 
-    const [age, setAge] = useState(null); 
+    const [difWalking, setdifWalking] = useState(null);
+    const [sex, setSex] = useState(null);
+    const [age, setAge] = useState(null);
     const [education, setEducation] = useState(null);
     const [income, setIncome] = useState(null);
 
@@ -56,7 +56,7 @@ const DataCollection = () => {
         doctorCost !== null &&
         genHlth !== "" &&
         mentHlth !== "" &&
-        physHlth !== "" && 
+        physHlth !== "" &&
         difWalking !== null &&
         sex !== null &&
         age !== null &&
@@ -68,76 +68,76 @@ const DataCollection = () => {
         setBmi(value === "" ? "" : parseFloat(value));
     };
     const handlePredictAPI = async () => {
-    const X = [
-        [
-        highBp ? 1 : 0,
-        highChol ? 1 : 0,
-        cholChecked5yr ? 1 : 0,
-        bmi,
-        smoker ? 1 : 0,
-        stroke ? 1 : 0,
-        heartIssues ? 1 : 0,
-        physActivity ? 1 : 0,
-        fruits ? 1 : 0,
-        veggies ? 1 : 0,
-        alcohol ? 1 : 0,
-        healthCoverage ? 1 : 0,
-        doctorCost ? 1 : 0,
-        genHlth,
-        mentHlth,
-        physHlth ,
-        difWalking ? 1 : 0,
-        sex,
-        ageToBRFSS(age),
-        education,
-        income
-        ]
-    ];
+        const X = [
+            [
+                highBp ? 1 : 0,
+                highChol ? 1 : 0,
+                cholChecked5yr ? 1 : 0,
+                bmi,
+                smoker ? 1 : 0,
+                stroke ? 1 : 0,
+                heartIssues ? 1 : 0,
+                physActivity ? 1 : 0,
+                fruits ? 1 : 0,
+                veggies ? 1 : 0,
+                alcohol ? 1 : 0,
+                healthCoverage ? 1 : 0,
+                doctorCost ? 1 : 0,
+                genHlth,
+                mentHlth,
+                physHlth,
+                difWalking ? 1 : 0,
+                sex,
+                ageToBRFSS(age),
+                education,
+                income
+            ]
+        ];
 
-    try {
-        //Call predict endpoint
-        const response = await fetch("http://localhost:8000/predict", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ X })
-        });
+        try {
+            //Call predict endpoint
+            const response = await fetch("http://localhost:8000/predict", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ X })
+            });
 
-        const data = await response.json();
+            const data = await response.json();
 
-        // Call SVM plot endpoint
-        const plotSVMResponse = await fetch("http://localhost:8000/plot_svm", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            pc_test: data.pc_testing,
-        })
-        });
-        const svmBlob = await plotSVMResponse.blob();
-        const svmPlotURL = URL.createObjectURL(svmBlob);
+            // Call SVM plot endpoint
+            const plotSVMResponse = await fetch("http://localhost:8000/plot_svm", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    pc_test: data.pc_testing,
+                })
+            });
+            const svmBlob = await plotSVMResponse.blob();
+            const svmPlotURL = URL.createObjectURL(svmBlob);
 
-        // Call logistic plot endpoint
-        const plotLogisticResponse = await fetch("http://localhost:8000/plot_logistic", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            pc_test: data.pc_testing,
-        })
-        });
-        const logisticBlob = await plotLogisticResponse.blob();
-        const logisticPlotURL = URL.createObjectURL(logisticBlob);
+            // Call logistic plot endpoint
+            const plotLogisticResponse = await fetch("http://localhost:8000/plot_logistic", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    pc_test: data.pc_testing,
+                })
+            });
+            const logisticBlob = await plotLogisticResponse.blob();
+            const logisticPlotURL = URL.createObjectURL(logisticBlob);
 
-        navigate("/results", {
-            state: {
-                probs: data.probs,
-                predictions: data.predictions,
-                svm_plot_url: svmPlotURL,
-                logistic_plot_url: logisticPlotURL
-            }
-        });
+            navigate("/results", {
+                state: {
+                    probs: data.probs,
+                    predictions: data.predictions,
+                    svm_plot_url: svmPlotURL,
+                    logistic_plot_url: logisticPlotURL
+                }
+            });
 
-    } catch (error) {
-        console.error("API error:", error);
-    }
+        } catch (error) {
+            console.error("API error:", error);
+        }
     };
 
 
@@ -545,7 +545,7 @@ const DataCollection = () => {
                         {/* 18. Sex */}
                         <div className="dc-row">
                             <span className="dc-question">
-                                Please select your sex. 
+                                Please select your sex.
                             </span>
                             <div className="dc-controls">
                                 <button
@@ -569,7 +569,7 @@ const DataCollection = () => {
                         <div className="dc-row">
                             <span className="dc-question">
                                 What is your age?
-                               </span>
+                            </span>
                             <div className="dc-controls">
                                 <input
                                     type="number"
@@ -593,48 +593,22 @@ const DataCollection = () => {
                                 What is your level of education?
                             </span>
                             <div className="dc-controls">
-                                <button
-                                    type="button"
-                                    className={`dc-btn ${education === 1 ? "dc-btn-active" : ""}`}
-                                    onClick={() => setEducation(1)}
+                                <select
+                                    className="dc-input"
+                                    value={education ?? ""}
+                                    onChange={(e) => {
+                                        const v = e.target.value;
+                                        setEducation(v === "" ? null : parseInt(v, 10));
+                                    }}
                                 >
-                                    Never attended school or only kindegarten
-                                </button>
-                                <button
-                                    type="button"
-                                    className={`dc-btn ${education === 2 ? "dc-btn-active" : ""}`}
-                                    onClick={() => setEducation(2)}
-                                >
-                                    Elementary and middle school
-                                </button>
-                                                                <button
-                                    type="button"
-                                    className={`dc-btn ${education === 3 ? "dc-btn-active" : ""}`}
-                                    onClick={() => setEducation(3)}
-                                >
-                                    Some high school
-                                </button>
-                                                                <button
-                                    type="button"
-                                    className={`dc-btn ${education === 4 ? "dc-btn-active" : ""}`}
-                                    onClick={() => setEducation(4)}
-                                >
-                                    High school graduate or equivalent(GED)
-                                </button>
-                                                                <button
-                                    type="button"
-                                    className={`dc-btn ${education === 5 ? "dc-btn-active" : ""}`}
-                                    onClick={() => setEducation(5)}
-                                >
-                                    Some college
-                                </button>
-                                                                <button
-                                    type="button"
-                                    className={`dc-btn ${education === 6 ? "dc-btn-active" : ""}`}
-                                    onClick={() => setEducation(6)}
-                                >
-                                    College graduate
-                                </button>
+                                    <option value="">Select your education level</option>
+                                    <option value={1}>Never attended school or only kindergarten</option>
+                                    <option value={2}>Elementary and middle school</option>
+                                    <option value={3}>Some high school</option>
+                                    <option value={4}>High school graduate or equivalent (GED)</option>
+                                    <option value={5}>Some college</option>
+                                    <option value={6}>College graduate</option>
+                                </select>
                             </div>
                         </div>
 
@@ -644,62 +618,24 @@ const DataCollection = () => {
                                 What is your income range?
                             </span>
                             <div className="dc-controls">
-                                <button
-                                    type="button"
-                                    className={`dc-btn ${income === 1 ? "dc-btn-active" : ""}`}
-                                    onClick={() => setIncome(1)}
+                                <select
+                                    className="dc-input"
+                                    value={income ?? ""}
+                                    onChange={(e) => {
+                                        const v = e.target.value;
+                                        setIncome(v === "" ? null : parseInt(v, 10));
+                                    }}
                                 >
-                                Less than $10,000
-                                </button>
-                                <button
-                                    type="button"
-                                    className={`dc-btn ${income === 2 ? "dc-btn-active" : ""}`}
-                                    onClick={() => setIncome(2)}
-                                >
-                                $10,000 - $14,999
-                                </button>
-                                                                <button
-                                    type="button"
-                                    className={`dc-btn ${income === 3 ? "dc-btn-active" : ""}`}
-                                    onClick={() => setIncome(3)}
-                                >
-                                $15,000 - $19,999
-                                </button>
-                                                                <button
-                                    type="button"
-                                    className={`dc-btn ${income === 4 ? "dc-btn-active" : ""}`}
-                                    onClick={() => setIncome(4)}
-                                >
-                                $20,000 - $24,999
-                                </button>
-                                                                <button
-                                    type="button"
-                                    className={`dc-btn ${income === 5 ? "dc-btn-active" : ""}`}
-                                    onClick={() => setIncome(5)}
-                                >
-                                $25,000 - $34,999
-                                </button>
-                                                                <button
-                                    type="button"
-                                    className={`dc-btn ${income === 6 ? "dc-btn-active" : ""}`}
-                                    onClick={() => setIncome(6)}
-                                >
-                                $35,000 - $49,999
-                                </button>
-                                                                <button
-                                    type="button"
-                                    className={`dc-btn ${income === 7 ? "dc-btn-active" : ""}`}
-                                    onClick={() => setIncome(7)}
-                                >
-                                $50,000 - $74,999
-                                </button>
-                                                                <button
-                                    type="button"
-                                    className={`dc-btn ${income === 8 ? "dc-btn-active" : ""}`}
-                                    onClick={() => setIncome(8)}
-                                >
-                                $75,000 or more
-                                </button>
+                                    <option value="">Select your income range</option>
+                                    <option value={1}>Less than $10,000</option>
+                                    <option value={2}>$10,000 - $14,999</option>
+                                    <option value={3}>$15,000 - $19,999</option>
+                                    <option value={4}>$20,000 - $24,999</option>
+                                    <option value={5}>$25,000 - $34,999</option>
+                                    <option value={6}>$35,000 - $49,999</option>
+                                    <option value={7}>$50,000 - $74,999</option>
+                                    <option value={8}>$75,000 or more</option>
+                                </select>
                             </div>
                         </div>
 
