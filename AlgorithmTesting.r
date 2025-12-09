@@ -1,9 +1,9 @@
 library(caTools)
 library(caret)
 
-data <- read.csv("../archive/diabetes_binary_5050split_health_indicators_BRFSS2015.csv",header=TRUE)
+data <- read.csv("./diabetes_binary_5050split_health_indicators_BRFSS2015.csv",header=TRUE)
 
-# factor variables
+#factor variables
 data$Diabetes_binary <- as.factor(data$Diabetes_binary)
 data <- data[sample(nrow(data)),]
 num_folds <- 10
@@ -29,25 +29,25 @@ for (i in 1:num_folds){
   }
   
   
-  # Separate features and labels
+  #Separate features and labels
   X_train <- train[, -1]
   y_train <- train[, 1]
   X_test  <- test[, -1]
   y_test  <- test[, 1]
   
-  # PCA on training fold
+  #PCA on training fold
   num_components <- 3
-  pc <- prcomp(X_train, center = TRUE, scale = TRUE)  # already scaled
+  pc <- prcomp(X_train, center = TRUE, scale = TRUE)
   trainTransformed <- as.data.frame(pc$x[, 1:num_components])
-  trainTransformed$Label <- y_train  # Add label column for caret
+  trainTransformed$Label <- y_train
   
-  # Project test fold using training PCA rotation
+  #Project test fold using PCA model
   X_test_scaled <- scale(X_test, center = pc$center, scale = pc$scale)
   testTransformed <- as.data.frame(as.matrix(X_test_scaled) %*% pc$rotation[, 1:num_components])
   testTransformed$Label <- y_test
   
   print("Training KNN")
-  # KNN, best accuracy: 0.7350, k = 35
+  # KNN, best accuracy: 0.7350, k = 25
   knnModel <- train(
     Label ~ ., 
     data = trainTransformed, 
@@ -85,25 +85,23 @@ for (i in 1:num_folds){
   
 }
 
-# After your cross-validation loop
-
-# Mean and standard deviation
+#Mean and standard deviation
 cat("KNN:  Mean =", mean(fold_accuracies_knn), " SD =", sd(fold_accuracies_knn), "\n")
 cat("SVM:  Mean =", mean(fold_accuracies_svm), " SD =", sd(fold_accuracies_svm), "\n")
 cat("Log:  Mean =", mean(fold_accuracies_log), " SD =", sd(fold_accuracies_log), "\n")
 
-# Paired t-tests
-# KNN vs SVM
+#Paired t-tests
+#KNN vs SVM
 t_knn_svm <- t.test(fold_accuracies_knn, fold_accuracies_svm, paired = TRUE)
 cat("\nPaired t-test KNN vs SVM:\n")
 print(t_knn_svm)
 
-# KNN vs Logistic
+#KNN vs Logistic
 t_knn_log <- t.test(fold_accuracies_knn, fold_accuracies_log, paired = TRUE)
 cat("\nPaired t-test KNN vs Logistic:\n")
 print(t_knn_log)
 
-# SVM vs Logistic
+#SVM vs Logistic
 t_svm_log <- t.test(fold_accuracies_svm, fold_accuracies_log, paired = TRUE)
 cat("\nPaired t-test SVM vs Logistic:\n")
 print(t_svm_log)

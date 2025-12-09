@@ -1,27 +1,34 @@
 import React from "react";
 import "../styles/Results.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Results = ({ healthGroup = "Diabetic" }) => {
     const navigate = useNavigate();
-
+    const location = useLocation();
+    //Get predictions and plots passed from DataCollection page
+    const predictions = location.state?.predictions;
+    const svm_plot_url = location.state?.svm_plot_url;
+    const svm_prediction = predictions[0][0][0]
+    const logistic_plot_url = location.state?.logistic_plot_url;
+    const logistic_prediction = predictions[1][0][0]
+    const probabilities = location.state?.probs;
+    const average_probability = Number(((probabilities[0][0][0] + probabilities[1][0][0]) / 2 * 100).toFixed(1));
     let message;
 
-    switch (healthGroup) {
-        case "Healthy":
+    //Change message depending on the predictions
+    if (svm_prediction === 0 && logistic_prediction === 0) {
             message =
-                "Our model indicates that you are currently at low risk for diabetes. Maintain your healthy lifestyle and continue regular check-ups with your doctor.";
-            break;
-        case "Prediabetic":
-            message =
-                "Our model indicates that you may be at increased risk for developing diabetes. Lifestyle changes and early intervention can significantly reduce your risk. Please consult your doctor for personalized advice.";
-            break;
-        case "Diabetic":
-        default:
-            message =
-                "Our model indicates that you are at risk for diabetes. These results do not replace a real medical diagnosis. See your doctor for a proper diagnosis and treatment plan.";
-            break;
+                "Our models indicate that you are currently at low risk for diabetes. Maintain your healthy lifestyle and continue regular check-ups with your doctor.";
+            healthGroup = "Healthy"
     }
+    //Say user is at risk if either of the two models says they are at risk
+    else{
+            message =
+                "Our models indicate that you may be at increased risk for developing diabetes. Lifestyle changes and early intervention can significantly reduce your risk. Please consult your doctor for personalized advice.";
+            healthGroup = "At risk for diabetes"
+    }
+
+    let probability_message  = "We estimate that you have a " + average_probability + "% chance of being at risk of diabetes."
 
     return (
         <div className="res-root">
@@ -37,33 +44,19 @@ const Results = ({ healthGroup = "Diabetic" }) => {
                     </p>
 
                     <p className="res-message">{message}</p>
+                    <p className="res-message">{probability_message}</p>
 
                     <div className="res-models">
                         {/* Logistic Regression */}
                         <div className="res-model-section">
                             <h2 className="res-model-title">Logistic Regression:</h2>
-                            <div className="res-placeholder large">
-                                <span>Plot Placeholder</span>
-                            </div>
+                                <img src={logistic_plot_url} />
                         </div>
 
                         {/* Support Vector Machine */}
                         <div className="res-model-section">
                             <h2 className="res-model-title">Support Vector Machine:</h2>
-                            <div className="res-svm-grid">
-                                <div className="res-placeholder small">
-                                    <span>Plot</span>
-                                </div>
-                                <div className="res-placeholder small">
-                                    <span>Plot</span>
-                                </div>
-                                <div className="res-placeholder small">
-                                    <span>Plot</span>
-                                </div>
-                                <div className="res-placeholder small">
-                                    <span>Plot</span>
-                                </div>
-                            </div>
+                                <img src={svm_plot_url} />
                         </div>
                     </div>
 
